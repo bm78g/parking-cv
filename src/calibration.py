@@ -60,7 +60,17 @@ def click_event(event, x, y, flags, param):
         cv2.imshow("display", img)
 
 def store_bounds():
-    pass
+    global polygons
+    bounds = []
+    
+    for poly in polygons:
+        bound = {
+            "vertices": poly,
+        }
+        bounds.append(bound)
+    
+    with open("data/bounds/bounds.json", "w") as file:
+        json.dump(bounds, file, indent=4)
 
 img = cv2.imread('data/images/sample.jpg')
 
@@ -71,7 +81,7 @@ cv2.imshow("display", img)
 cv2.setMouseCallback("display", click_event)
 
 while True:
-    key = cv2.waitKey(1) & 0xFF
+    key = cv2.waitKey(1) & 0xFF # Wait a millisecond for input
     if key == ord('s'):
         store_bounds()
         break
