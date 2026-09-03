@@ -16,14 +16,17 @@ def click_event(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         cv2.circle(img, center=(x, y), radius=3, color=(0, 0, 255), thickness=-1)
         vertices.append([x, y])
+
+        # Draw polygon once enough vertices are selected
         if len(vertices) == 4:
             polygons.append(vertices.copy())
             vertices = []
 
+            # TODO: Add way to sort the vertices to always draw closed shape
+            # Sort vertices by height, then iterate first two in order, then iterate last two in reverse
+
             pts = np.array(polygons[len(polygons) - 1], np.int32)
-            print(pts)
             pts = pts.reshape((-1, 1, 2))
-            print(pts)
             cv2.polylines(img, [pts], True, (0, 255, 255))
         cv2.imshow("display", img)
 
