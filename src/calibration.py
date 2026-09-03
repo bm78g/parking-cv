@@ -1,11 +1,33 @@
 import cv2
+import sys
+import json
 
-sample_img = cv2.imread('data/sample.jpg')
+img = cv2.imread('data/sample.jpg')
 
-if sample_img is None:
-    print("Error: Could not read image")
-    exit(1)
+if img is None:
+    sys.exit("Image not found")
 
-cv2.imshow("Sample Image", sample_img)
-cv2.waitKey(0)
+vertices = []
+polygons = []
+
+def click_event(event, x, y, flags, param):
+    global vertices, polygons
+    if event == cv2.EVENT_LBUTTONDOWN:
+        cv2.circle(img, center=(x, y), radius=10, color=(0, 0, 255), thickness=-1)
+        cv2.imshow("display", img)
+        vertices.append([x, y])
+        if len(vertices) == 4:
+            polygons.append(vertices.copy())
+            vertices = []
+            print("polygons", polygons)
+            print(len(polygons))
+
+cv2.imshow("display", img)
+cv2.setMouseCallback("display", click_event)
+
+while True:
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('s'):
+        break
+
 cv2.destroyAllWindows()
