@@ -8,6 +8,10 @@ from pathlib import Path
 vertices = []
 polygons = []
 
+########################################################
+#                   IMAGE ANNOTATION                   #
+########################################################
+
 def find_center(vertices):
     x_avg = y_avg = 0
     for vertex in vertices:
@@ -54,6 +58,10 @@ def click_event(event, x, y, flags, param):
 
         cv2.imshow("display", img)
 
+########################################################
+#                     FILE STORAGE                     #
+########################################################
+
 def store_bounds():
     global polygons
     bounds = []
@@ -83,6 +91,10 @@ def store_bounds():
             with open(store_path, "w") as file:
                 json.dump(bounds, file, indent=4)
             break
+
+########################################################
+#                    INITIALIZATION                    #
+########################################################
 
 path = "data/images/"
 filename = "sample.jpg"
