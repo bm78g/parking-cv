@@ -38,6 +38,7 @@ def draw_bound(vertices, polygons):
     cv2.circle(img, center=center, radius=3, color=(255, 0, 0), thickness=-1)
 
     # Vertices sorted to ensure shape is closed
+    # Otherwise, bounds will be drawn in the order they were selected, often creating figure-8's
     v_sorted = sort_vertices(center, vertices, polygons)
     polygons.append(v_sorted.copy())
 
