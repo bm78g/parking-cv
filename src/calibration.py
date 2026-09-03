@@ -12,6 +12,45 @@ if img is None:
 vertices = []
 polygons = []
 
+def find_center():
+    global vertices, polygons
+
+    x_avg = y_avg = 0
+    for vertex in vertices:
+        x_avg += vertex[0]
+        y_avg += vertex[1]
+    x_avg /= 4
+    y_avg /= 4
+    center = (round(x_avg), round(y_avg))
+    return center
+
+def sort_vertices(center):
+    global vertices, polygons
+
+    angles = []
+    for vertex in vertices:
+        angle = math.atan2(vertex[1] - center[1], vertex[0] - center[0])
+        angles.append(angle)
+
+    # Sort vertices based on angle from center
+    v_sorted = [x for _, x in sorted(zip(angles, vertices))]
+    return v_sorted
+
+def draw_bound():
+    global vertices, polygons
+
+    center = find_center()
+    # Draw center for debug purposes
+    cv2.circle(img, center=center, radius=3, color=(255, 0, 0), thickness=-1)
+
+    # Vertices sorted to ensure shape is closed
+    v_sorted = sort_vertices(center)
+    polygons.append(v_sorted.copy())
+
+    pts = np.array(polygons[len(polygons) - 1], np.int32)
+    pts = pts.reshape((-1, 1, 2))
+    cv2.polylines(img, [pts], True, (0, 255, 255))
+
 def click_event(event, x, y, flags, param):
     global vertices, polygons
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -20,31 +59,9 @@ def click_event(event, x, y, flags, param):
 
         # Draw polygon once enough vertices are selected
         if len(vertices) == 4:
-            # TODO: Add way to sort the vertices to always draw closed shape
-            x_avg = y_avg = 0
-            for vertex in vertices:
-                x_avg += vertex[0]
-                y_avg += vertex[1]
-            x_avg /= 4
-            y_avg /= 4
-            center = (round(x_avg), round(y_avg))
-
-            # Draw center for debug purposes
-            cv2.circle(img, center=center, radius=3, color=(255, 0, 0), thickness=-1)
-
-            resp_angles = []
-            for vertex in vertices:
-                angle = math.atan2(vertex[1] - center[1], vertex[0] - center[0])
-                resp_angles.append(angle)
-
-            vertices_sorted = [x for _, x in sorted(zip(resp_angles, vertices))]
-
-            polygons.append(vertices_sorted.copy())
+            draw_bound()
             vertices = []
 
-            pts = np.array(polygons[len(polygons) - 1], np.int32)
-            pts = pts.reshape((-1, 1, 2))
-            cv2.polylines(img, [pts], True, (0, 255, 255))
         cv2.imshow("display", img)
 
 cv2.imshow("display", img)
