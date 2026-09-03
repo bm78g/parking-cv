@@ -7,9 +7,7 @@ import math
 vertices = []
 polygons = []
 
-def find_center():
-    global vertices, polygons
-
+def find_center(vertices):
     x_avg = y_avg = 0
     for vertex in vertices:
         x_avg += vertex[0]
@@ -19,9 +17,7 @@ def find_center():
     center = (round(x_avg), round(y_avg))
     return center
 
-def sort_vertices(center):
-    global vertices, polygons
-
+def sort_vertices(center, vertices, polygons):
     angles = []
     for vertex in vertices:
         angle = math.atan2(vertex[1] - center[1], vertex[0] - center[0])
@@ -31,15 +27,13 @@ def sort_vertices(center):
     v_sorted = [x for _, x in sorted(zip(angles, vertices))]
     return v_sorted
 
-def draw_bound():
-    global vertices, polygons
-
-    center = find_center()
+def draw_bound(vertices, polygons):
+    center = find_center(vertices)
     # Draw center for debug purposes
     cv2.circle(img, center=center, radius=3, color=(255, 0, 0), thickness=-1)
 
     # Vertices sorted to ensure shape is closed
-    v_sorted = sort_vertices(center)
+    v_sorted = sort_vertices(center, vertices, polygons)
     polygons.append(v_sorted.copy())
 
     pts = np.array(polygons[len(polygons) - 1], np.int32)
@@ -54,7 +48,7 @@ def click_event(event, x, y, flags, param):
 
         # Draw polygon once enough vertices are selected
         if len(vertices) == 4:
-            draw_bound()
+            draw_bound(vertices, polygons)
             vertices = []
 
         cv2.imshow("display", img)
@@ -66,6 +60,7 @@ def store_bounds():
     for poly in polygons:
         bound = {
             "vertices": poly,
+            "center": find_center(poly)
         }
         bounds.append(bound)
     
