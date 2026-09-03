@@ -4,11 +4,6 @@ import json
 import numpy as np
 import math
 
-img = cv2.imread('data/sample.jpg')
-
-if img is None:
-    sys.exit("Image not found")
-
 vertices = []
 polygons = []
 
@@ -64,12 +59,21 @@ def click_event(event, x, y, flags, param):
 
         cv2.imshow("display", img)
 
+def store_bounds():
+    pass
+
+img = cv2.imread('data/images/sample.jpg')
+
+if img is None:
+    sys.exit("Image not found")
+
 cv2.imshow("display", img)
 cv2.setMouseCallback("display", click_event)
 
 while True:
     key = cv2.waitKey(1) & 0xFF
     if key == ord('s'):
+        store_bounds()
         break
 
 cv2.destroyAllWindows()
