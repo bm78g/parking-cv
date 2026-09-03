@@ -3,6 +3,7 @@ import sys
 import json
 import numpy as np
 import math
+from pathlib import Path
 
 vertices = []
 polygons = []
@@ -63,11 +64,29 @@ def store_bounds():
             "center": find_center(poly)
         }
         bounds.append(bound)
-    
-    with open("data/bounds/bounds.json", "w") as file:
-        json.dump(bounds, file, indent=4)
 
-img = cv2.imread('data/images/sample.jpg')
+    # Incremental versioning of bounds data to avoid destructive overwrites
+
+    # Create directory
+    filename_stem = Path(filename).stem
+    bounds_dir = Path(f"data/bounds/{filename_stem}")
+    bounds_dir.mkdir(parents=True, exist_ok=True)
+
+    count = 0
+    while True:
+        store_path = f"data/bounds/{filename_stem}/{count:04d}.json"
+        store_path = Path(store_path)
+
+        if store_path.is_file():
+            count += 1
+        else:
+            with open(store_path, "w") as file:
+                json.dump(bounds, file, indent=4)
+            break
+
+path = "data/images/"
+filename = "sample.jpg"
+img = cv2.imread(path + filename)
 
 if img is None:
     sys.exit("Image not found")
