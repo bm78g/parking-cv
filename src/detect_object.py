@@ -16,13 +16,21 @@ from pathlib import Path
 # However, there will need to be measures to prevent an unparked
 # car from being matched to a spot.
 
-def get_contact_cords():
+def get_contact_coords(coords):
     # Calculate a point horizontally center and slightly above lower bound
-    pass
+    x_center = (coords[0] + coords[2]) / 2
+
+    height = coords[3] - coords[1]
+    y_low = coords[3] - (height * 0.25)
+
+    contact_coords = (round(x_center), round(y_low))
+
+    cv2.circle(annotated_img, center=contact_coords, radius=3, color=(0, 0, 255), thickness=-1)
+    cv2.imshow("display", annotated_img)
 
 def match_vehicle(coords):
     # Match to closest center for now
-    pass
+    contact_pos = get_contact_coords(coords)
 
 def match_vehicles(results):
     # Extract coords and call match_vehicle
