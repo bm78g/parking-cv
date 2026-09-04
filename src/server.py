@@ -1,6 +1,17 @@
 # I forgot I set up the REST API for EventBridge to
 # trigger the CV computation via an API call, so reinstating this
 
+# I initially thought about running this entire application through AWS lambda,
+# but eventually thought against it in favor of a long-running server
+
+# The general architecture:
+# Camera system -> triggers event + adds image to S3
+#   -> EventBridge calls /api/compute -> this program retrieves image from S3
+#       -> Computes image -> Uploads result to DynamoDB -> API Backend serves
+
+# This server could've provided the JSON data itself, but decided
+# against it in favor of decoupling systems
+
 from flask import Flask, jsonify
 from detect_object import compute
 
