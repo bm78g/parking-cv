@@ -1,3 +1,6 @@
+# I forgot I set up the REST API for EventBridge to
+# trigger the CV computation via an API call, so reinstating this
+
 from flask import Flask
 
 app = Flask(__name__)
