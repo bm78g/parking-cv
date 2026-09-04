@@ -53,6 +53,7 @@ def match_vehicle(coords, spots):
     # TODO: Add check to ensure the car is whithin the spot
     return nearest_spot
 
+# Returns a list of occupied spots by id
 def match_vehicles(results, spots):
     # Extract coords and call match_vehicle
     occupied = []
@@ -63,7 +64,14 @@ def match_vehicles(results, spots):
             occupied.append(match_vehicle(coords, spots))
 
     occupied = list(set(occupied))
-    print(occupied)
+    return occupied
+
+########################################################
+#                   OCCUPANCY STORAGE                  #
+########################################################
+
+def store_occupancy():
+    pass
 
 ########################################################
 #                    INITIALIZATION                    #
@@ -90,7 +98,7 @@ annotated_img = results[0].plot()
 cv2.imshow("display", annotated_img)
 
 # This is where the fun begins
-match_vehicles(results, spots)
+occupied = match_vehicles(results, spots)
 
 while True:
     key = cv2.waitKey(1) & 0xFF
