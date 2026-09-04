@@ -2,6 +2,7 @@ import cv2
 from ultralytics import YOLO
 import json
 from pathlib import Path
+import math
 
 ########################################################
 #                OJBECT-TO-SPOT MATCHING               #
@@ -28,16 +29,30 @@ def get_contact_coords(coords):
     cv2.circle(annotated_img, center=contact_coords, radius=3, color=(0, 0, 255), thickness=-1)
     cv2.imshow("display", annotated_img)
 
-def match_vehicle(coords):
+def match_vehicle(coords, spots):
     # Match to closest center for now
+    # This does make matching an O(N^2) operation,
+    # but the sample size is small enough for it to not be a problem
     contact_pos = get_contact_coords(coords)
 
-def match_vehicles(results):
+    min_disp = math.inf
+    for spot in spots:
+        # Find centers and use Pythagorean theorem to find displacement
+        obj_center = ((coords[0] + coords[2]) / 2, (coords[1] + coords[3]) / 2)
+        x_diff = spot["center"][0] - obj_center[0]
+        y_diff = spot["center"][1] - obj_center[1]
+        disp = math.sqrt(math.pow(x_diff, 2) + math.pow(y_diff, 2))
+        
+        if disp < min_disp:
+            min_disp = disp
+        
+
+def match_vehicles(results, spots):
     # Extract coords and call match_vehicle
     for result in results:
         for box in result.boxes:
             coords = box.xyxy[0].tolist()
-            match_vehicle(coords)
+            match_vehicle(coords, spots)
 
 ########################################################
 #                    INITIALIZATION                    #
@@ -64,7 +79,7 @@ annotated_img = results[0].plot()
 cv2.imshow("display", annotated_img)
 
 # This is where the fun begins
-match_vehicles(results)
+match_vehicles(results, spots)
 
 while True:
     key = cv2.waitKey(1) & 0xFF
