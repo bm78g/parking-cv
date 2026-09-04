@@ -20,13 +20,16 @@ def get_contact_cords():
     # Calculate a point horizontally center and slightly above lower bound
     pass
 
-def match_vehicle():
+def match_vehicle(coords):
     # Match to closest center for now
     pass
 
-def match_vehicles():
+def match_vehicles(results):
     # Extract coords and call match_vehicle
-    pass
+    for result in results:
+        for box in result.boxes:
+            coords = box.xyxy[0].tolist()
+            match_vehicle(coords)
 
 ########################################################
 #                    INITIALIZATION                    #
@@ -47,10 +50,13 @@ with open("data/bounds/sample/0000.json") as file:
 img = cv2.imread(img_path)
 
 # Display results for debug purposes
-results = model.predict(img, conf=0.4, verbose=False)
+results = model.predict(img, classes=CLASSES, conf=0.4, verbose=False)
 
 annotated_img = results[0].plot()
 cv2.imshow("display", annotated_img)
+
+# This is where the fun begins
+match_vehicles(results)
 
 while True:
     key = cv2.waitKey(1) & 0xFF
