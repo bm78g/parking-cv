@@ -27,7 +27,6 @@ def get_contact_coords(coords):
     contact_coords = (round(x_center), round(y_low))
 
     cv2.circle(annotated_img, center=contact_coords, radius=3, color=(0, 0, 255), thickness=-1)
-    cv2.imshow("display", annotated_img)
 
     return contact_coords
 
@@ -70,8 +69,31 @@ def match_vehicles(results, spots):
 #                   OCCUPANCY STORAGE                  #
 ########################################################
 
-def store_occupancy():
-    pass
+def store_occupancy(spots, occupied):
+    data = []
+    queue = occupied.copy()
+
+    index = 0
+    for spot in spots:
+        occupied = False
+        if index == queue[0]:
+            occupied = True
+            queue.pop(0)
+
+        occupancy = {
+            "id": spot["id"],
+            "occupied": occupied
+        }
+        data.append(occupancy)
+
+        index += 1
+
+    datapath = Path(f"data/occupancies")
+    datapath.mkdir(parents=True, exist_ok=True)
+    
+    with open(f"data/occupancies/{Path(filename).stem}.json", "w") as file:
+        json.dump(data, file, indent=4)
+
 
 ########################################################
 #                    INITIALIZATION                    #
@@ -95,12 +117,16 @@ img = cv2.imread(img_path)
 results = model.predict(img, classes=CLASSES, conf=0.4, verbose=False)
 
 annotated_img = results[0].plot()
-cv2.imshow("display", annotated_img)
 
 # This is where the fun begins
 occupied = match_vehicles(results, spots)
+store_occupancy(spots, occupied)
 
-while True:
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord('s'):
-        break
+
+# UNCOMMENT FOR VISUAL DEBUG
+# cv2.imshow("display", annotated_img)
+
+# while True:
+#     key = cv2.waitKey(1) & 0xFF
+#     if key == ord('s'):
+#         break
