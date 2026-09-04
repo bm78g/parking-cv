@@ -29,6 +29,9 @@ def get_contact_coords(coords):
     cv2.circle(annotated_img, center=contact_coords, radius=3, color=(0, 0, 255), thickness=-1)
     cv2.imshow("display", annotated_img)
 
+    return contact_coords
+
+# Returns the id of the nearest spot
 def match_vehicle(coords, spots):
     # Match to closest center for now
     # This does make matching an O(N^2) operation,
@@ -36,23 +39,31 @@ def match_vehicle(coords, spots):
     contact_pos = get_contact_coords(coords)
 
     min_disp = math.inf
+    nearest_spot = None
     for spot in spots:
         # Find centers and use Pythagorean theorem to find displacement
-        obj_center = ((coords[0] + coords[2]) / 2, (coords[1] + coords[3]) / 2)
-        x_diff = spot["center"][0] - obj_center[0]
-        y_diff = spot["center"][1] - obj_center[1]
+        x_diff = spot["center"][0] - contact_pos[0]
+        y_diff = spot["center"][1] - contact_pos[1]
         disp = math.sqrt(math.pow(x_diff, 2) + math.pow(y_diff, 2))
         
         if disp < min_disp:
             min_disp = disp
-        
+            nearest_spot = spot["id"]
+    
+    # TODO: Add check to ensure the car is whithin the spot
+    return nearest_spot
 
 def match_vehicles(results, spots):
     # Extract coords and call match_vehicle
+    occupied = []
+
     for result in results:
         for box in result.boxes:
             coords = box.xyxy[0].tolist()
-            match_vehicle(coords, spots)
+            occupied.append(match_vehicle(coords, spots))
+
+    occupied = list(set(occupied))
+    print(occupied)
 
 ########################################################
 #                    INITIALIZATION                    #
