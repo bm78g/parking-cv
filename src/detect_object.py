@@ -7,7 +7,16 @@ from pathlib import Path
 #                OJBECT-TO-SPOT MATCHING               #
 ########################################################
 
-def get_bottom_coords():
+# I'm assuming that getting the lower center of a bound will
+# roughly calculate where the car touches the ground.
+# It doesn't work as well for a perfect top-down view, but
+# probably more practical for a more slanted camera angle.
+
+# The contact coords will then be linked to the nearest center.
+# However, there will need to be measures to prevent an unparked
+# car from being matched to a spot.
+
+def get_contact_cords():
     # Calculate a point horizontally center and slightly above lower bound
     pass
 
