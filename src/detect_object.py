@@ -105,6 +105,9 @@ def store_occupancy(spots, occupied):
     with open(f"data/occupancies/{Path(filename).stem}.json", "w") as file:
         json.dump(data, file, indent=4)
 
+def compute():
+    occupied = match_vehicles(results, spots)
+    store_occupancy(spots, occupied)
 
 ########################################################
 #                    INITIALIZATION                    #
@@ -128,11 +131,6 @@ img = cv2.imread(img_path)
 results = model.predict(img, classes=CLASSES, conf=0.4, verbose=False)
 
 annotated_img = results[0].plot()
-
-# This is where the fun begins
-occupied = match_vehicles(results, spots)
-store_occupancy(spots, occupied)
-
 
 # UNCOMMENT FOR VISUAL DEBUG
 # cv2.imshow("display", annotated_img)
