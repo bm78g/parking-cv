@@ -78,6 +78,8 @@ def store_bounds():
         count += 1
 
     # Incremental versioning of bounds data to avoid destructive overwrites
+    # It's especially critical for the calibration to be non-destructive,
+    # as the process is fully manual while other processes are automatic and idempotent
 
     # Create directory
     filename_stem = Path(filename).stem
