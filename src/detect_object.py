@@ -44,12 +44,21 @@ def match_vehicle(coords, spots):
         x_diff = spot["center"][0] - contact_pos[0]
         y_diff = spot["center"][1] - contact_pos[1]
         disp = math.sqrt(math.pow(x_diff, 2) + math.pow(y_diff, 2))
+
+        # Average diagonal radius for 4 points
+        # Used as maximum distance allowed to be counted as occupying a spot
+        avg_radius = 0
+        for vertex in spot["vertices"]:
+            x_diff_center = spot["center"][0] - vertex[0]
+            y_diff_center = spot["center"][1] - vertex[1]
+            radius = math.sqrt(math.pow(x_diff_center, 2) + math.pow(y_diff_center, 2))
+            avg_radius += radius
+        avg_radius /= 4
         
-        if disp < min_disp:
+        if disp < min_disp and disp < avg_radius:
             min_disp = disp
             nearest_spot = spot["id"]
     
-    # TODO: Add check to ensure the car is whithin the spot
     return nearest_spot
 
 # Returns a list of occupied spots by id
@@ -60,7 +69,9 @@ def match_vehicles(results, spots):
     for result in results:
         for box in result.boxes:
             coords = box.xyxy[0].tolist()
-            occupied.append(match_vehicle(coords, spots))
+            matched = match_vehicle(coords, spots)
+            if matched != None:
+                occupied.append(matched)
 
     occupied = list(set(occupied))
     return occupied
